@@ -129,7 +129,9 @@ namespace NLog
         public bool ThrowExceptions { get; set; }
 
         /// <summary>
-        /// Gets or sets the current logging configuration.
+        /// Gets or sets the current logging configuration. After setting this property all
+        /// existing loggers will be re-configured, so that there is no need to call <see cref="ReconfigExistingLoggers" />
+        /// manually.
         /// </summary>
         public LoggingConfiguration Configuration
         {
@@ -385,7 +387,9 @@ namespace NLog
                 this.config.InitializeAll();
             }
 
-            foreach (var logger in loggerCache.Loggers)
+            //new list to avoid "Collection was modified; enumeration operation may not execute"
+            var loggers = new List<Logger>(loggerCache.Loggers);
+            foreach (var logger in loggers)
             {
                 logger.SetConfiguration(this.GetConfigurationForLogger(logger.Name, this.config));
             }
